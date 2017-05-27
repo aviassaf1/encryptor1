@@ -4,9 +4,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Random;
 
-public class Cmd {
+public class Cmd implements Observer{
 
 	public static void main(String[] args) {
 		BufferedReader buffer=new BufferedReader(new InputStreamReader(System.in));
@@ -42,27 +44,55 @@ public class Cmd {
 	}
 
 	private static void activateAlgo(boolean enc, int algoNum,String path) {
+		Cmd cmd=new Cmd(); 
 		if(enc){
 			if(algoNum==1){
 				int key=getNewKey();
-				new Ceasar().enc(path,key);
+				Ceasar ceasar= new Ceasar();
+				ceasar.addObserver(cmd);
+				ceasar.enc(path,key);
 			}
 			else if(algoNum==2){
 				int key=getNewKey();
-				new Xor().dec(path,key);
+				Xor xor= new Xor();
+				xor.addObserver(cmd);
+				xor.enc(path,key);
 			}
-			else if(algoNum==3){}
+			else if(algoNum==3){
+				int key=getNewMulKey();
+				Multiplication multiplication= new Multiplication();
+				multiplication.addObserver(cmd);
+				multiplication.enc(path,key);
+			}
 		}
 		else{
 			if(algoNum==1){
-				int key=getKeyFomUser();
-				new Ceasar().dec(path,key);
+				int key=getKeyFromUser();
+				Ceasar ceasar= new Ceasar();
+				ceasar.addObserver(cmd);
+				ceasar.dec(path,key);
 			}
 			else if(algoNum==2){
-				int key=getKeyFomUser();
-				new Xor().dec(path,key);
+				int key=getKeyFromUser();
+				Xor xor= new Xor();
+				xor.addObserver(cmd);
+				xor.dec(path,key);
 			}
-			else if(algoNum==3){}
+			else if(algoNum==3){
+				boolean goodKey=false;
+				while(!goodKey)
+				{
+					int key=getKeyMulFromUser();
+					try {
+						Multiplication multiplication= new Multiplication();
+						multiplication.addObserver(cmd);
+						multiplication.dec(path,key);
+						goodKey=true;
+					} catch (IlegalKeyException e) {
+						System.err.println("there was a problem with the key, please try another key");
+					}
+				}
+			}
 		}
 	}
 
@@ -88,7 +118,7 @@ public class Cmd {
 		return num;
 	}
 
-	private static int getKeyFomUser() {
+	private static int getKeyFromUser() {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		System.out.println("please enter your key:");
 		boolean enteredNum=false;
@@ -99,6 +129,27 @@ public class Cmd {
 				enteredNum=true;
 			} catch (Exception e) {
 				System.out.println("please enter your key (key should be a number):");
+			}
+		}
+		return num;
+	}
+	
+	private static int getKeyMulFromUser() {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("please enter your key:");
+		boolean enteredNum=false;
+		int num=0;
+		while(!enteredNum){
+			try {
+				num = Integer.parseInt(br.readLine());
+				if(num%2==0){
+					System.out.println("please enter your key (key should be an odd number):");
+				}
+				else{
+					enteredNum=true;
+				}
+			} catch (Exception e) {
+				System.out.println("please enter your key (key should be an odd number):");
 			}
 		}
 		return num;
@@ -127,6 +178,19 @@ public class Cmd {
 		int key=rnd.nextInt(255);
 		System.out.println("The key is: "+key );
 		return key;
+	}
+	private static int getNewMulKey() {
+		Random rnd=new Random();
+		int key=0;
+		while(key%2==0||key==0){//may not need ==0
+			key=rnd.nextInt(255);
+		}
+		System.out.println("The key is: "+key );
+		return key;
+	}
+
+	public void update(Observable o, Object arg) {
+		System.out.println(arg);
 	}
 	
 }
