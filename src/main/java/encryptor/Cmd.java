@@ -13,6 +13,7 @@ public class Cmd {
 		String line;
 		String path="";
 		boolean chooseEncOrDec=false;
+		boolean enc=false;
 		boolean done=false;
 		while(!done){
 			try {
@@ -21,26 +22,70 @@ public class Cmd {
 					line=buffer.readLine();
 					if(line.equals("E")){
 						chooseEncOrDec=true;
-						path=getFilePath();
-						int key=getNewKey();
-						Ceasar.enc1(path,key);
-						done=true;
+						enc=true;
 					}
 					else if(line.equals("D")){
 						chooseEncOrDec=true;
-						path=getFilePath();
-						int key=getKeyFomUser();
-						Ceasar.dec1(path,key);
-						done=true;
 					}
 					else{
 						System.out.println("please choose only one of the options enryption(E) or decription(D)");
 					}
 				}
+				path=getFilePath();
+				int algoNum=chooseAlgorithm();
+				activateAlgo(enc,algoNum,path);
+				done=true;
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private static void activateAlgo(boolean enc, int algoNum,String path) {
+		if(enc){
+			if(algoNum==1){
+				int key=getNewKey();
+				new Ceasar().enc(path,key);
+			}
+			else if(algoNum==2){
+				int key=getNewKey();
+				new Xor().dec(path,key);
+			}
+			else if(algoNum==3){}
+		}
+		else{
+			if(algoNum==1){
+				int key=getKeyFomUser();
+				new Ceasar().dec(path,key);
+			}
+			else if(algoNum==2){
+				int key=getKeyFomUser();
+				new Xor().dec(path,key);
+			}
+			else if(algoNum==3){}
+		}
+	}
+
+	private static int chooseAlgorithm() {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("please choose the encyption  algorithm:");	
+		System.out.println("(1) Ceaser, (2) Xor, (3) Multiplicayion");
+		boolean enteredNum=false;
+		int num=0;
+		while(!enteredNum){
+			try {
+				num = Integer.parseInt(br.readLine());
+				if(num<1||num>3){
+					System.out.println("please enter number (1-3):");
+				}
+				else{
+					enteredNum=true;
+				}
+			} catch (Exception e) {
+				System.out.println("please enter number (1-3):");
+			}
+		}
+		return num;
 	}
 
 	private static int getKeyFomUser() {
