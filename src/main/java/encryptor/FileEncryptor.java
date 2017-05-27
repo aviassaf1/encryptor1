@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import javax.imageio.IIOException;
+
 public class FileEncryptor {
 	
-	protected static byte[] getFileBytes(String path) throws Exception {
+	protected static byte[] getFileBytes(String path) throws IOException {
 		byte[] byts=new byte[0];
 		byts = Files.readAllBytes(Paths.get(path));
 		//System.err.println("there was a problem to get "+path+" please try another path");
