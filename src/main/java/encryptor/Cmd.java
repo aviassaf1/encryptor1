@@ -45,54 +45,65 @@ public class Cmd implements Observer{
 
 	private static void activateAlgo(boolean enc, int algoNum,String path) {
 		Cmd cmd=new Cmd(); 
-		if(enc){
-			if(algoNum==1){
-				int key=getNewKey();
-				Ceasar ceasar= new Ceasar();
-				ceasar.addObserver(cmd);
-				ceasar.enc(path,key);
+		byte[] plaintext;
+		if(algoNum<1||algoNum>3)
+			return;
+		try {
+			plaintext = FileEncryptor.getFileBytes(path);
+			byte[] ans = null;
+			if(enc){
+				if(algoNum==1){
+					int key=getNewKey();
+					Ceasar ceasar= new Ceasar();
+					ceasar.addObserver(cmd);
+					ans=ceasar.enc(path,key,plaintext);
+				}
+				else if(algoNum==2){
+					int key=getNewKey();
+					Xor xor= new Xor();
+					xor.addObserver(cmd);
+					ans=xor.enc(path,key,plaintext);
+				}
+				else if(algoNum==3){
+					int key=getNewMulKey();
+					Multiplication multiplication= new Multiplication();
+					multiplication.addObserver(cmd);
+					ans=multiplication.enc(path,key,plaintext);
+				}
+				FileEncryptor.saveEncFile(path,ans);
 			}
-			else if(algoNum==2){
-				int key=getNewKey();
-				Xor xor= new Xor();
-				xor.addObserver(cmd);
-				xor.enc(path,key);
-			}
-			else if(algoNum==3){
-				int key=getNewMulKey();
-				Multiplication multiplication= new Multiplication();
-				multiplication.addObserver(cmd);
-				multiplication.enc(path,key);
-			}
-		}
-		else{
-			if(algoNum==1){
-				int key=getKeyFromUser();
-				Ceasar ceasar= new Ceasar();
-				ceasar.addObserver(cmd);
-				ceasar.dec(path,key);
-			}
-			else if(algoNum==2){
-				int key=getKeyFromUser();
-				Xor xor= new Xor();
-				xor.addObserver(cmd);
-				xor.dec(path,key);
-			}
-			else if(algoNum==3){
-				boolean goodKey=false;
-				while(!goodKey)
-				{
-					int key=getKeyMulFromUser();
-					try {
-						Multiplication multiplication= new Multiplication();
-						multiplication.addObserver(cmd);
-						multiplication.dec(path,key);
-						goodKey=true;
-					} catch (IlegalKeyException e) {
-						System.err.println("there was a problem with the key, please try another key");
+			else{
+				if(algoNum==1){
+					int key=getKeyFromUser();
+					Ceasar ceasar= new Ceasar();
+					ceasar.addObserver(cmd);
+					ans=ceasar.dec(path,key,plaintext);
+				}
+				else if(algoNum==2){
+					int key=getKeyFromUser();
+					Xor xor= new Xor();
+					xor.addObserver(cmd);
+					ans=xor.dec(path,key,plaintext);
+				}
+				else if(algoNum==3){
+					boolean goodKey=false;
+					while(!goodKey)
+					{
+						int key=getKeyMulFromUser();
+						try {
+							Multiplication multiplication= new Multiplication();
+							multiplication.addObserver(cmd);
+							ans=multiplication.dec(path,key,plaintext);
+							goodKey=true;
+						} catch (IlegalKeyException e) {
+							System.err.println("there was a problem with the key, please try another key");
+						}
 					}
 				}
+				FileEncryptor.saveDecFile(path,ans);
 			}
+		} catch (IOException e) {
+			System.err.println("there was a problem to get "+path+" please try another path");
 		}
 	}
 
