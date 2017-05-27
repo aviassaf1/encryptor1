@@ -2,8 +2,10 @@ package encryptor;
 
 public class Multiplication extends Algorithm {
 
+
 	@Override
-	public byte[]  enc(String path, int key,byte[] plaintext) {
+	public byte[]  enc(byte[] plaintext) {
+		int key=getNewMulKey();
 		long startTime = System.nanoTime();
 		notifyObservers("start Multiplication encryption");
 		byte[] ans;
@@ -18,19 +20,29 @@ public class Multiplication extends Algorithm {
 	}
 
 	@Override
-	public byte[] dec(String path, int key,byte[] plaintext) throws IlegalKeyException {
-		long startTime = System.nanoTime();
-		notifyObservers("start Multiplication decryption");
-		byte reversKey=findreversKey(key);
-		byte[] ans;
-		ans = plaintext;
-		for (int i = 0; i < ans.length; i++) {
-			ans[i]=(byte) (ans[i]*reversKey);
-		}	
-		long endTime = System.nanoTime();
-		long duration = (endTime - startTime);
-		notifyObservers("finish Multiplication decryption and took: " +duration);
-		return ans;
+	public byte[] dec(byte[] plaintext) {
+		int key=getKeyMulFromUser();
+		boolean goodKey=false;
+		while(!goodKey)
+		{
+			try {
+				long startTime = System.nanoTime();
+				notifyObservers("start Multiplication decryption");
+				byte reversKey=findreversKey(key);
+				byte[] ans;
+				ans = plaintext;
+				for (int i = 0; i < ans.length; i++) {
+					ans[i]=(byte) (ans[i]*reversKey);
+				}	
+				long endTime = System.nanoTime();
+				long duration = (endTime - startTime);
+				notifyObservers("finish Multiplication decryption and took: " +duration);
+				return ans;
+			} catch (IlegalKeyException e) {
+				System.err.println("there was a problem with the key, please try another key");
+			}
+		}
+		return null;
 	}
 
 	private byte findreversKey(int key) throws IlegalKeyException {

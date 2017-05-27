@@ -2,9 +2,10 @@ package encryptor;
 
 
 public class Ceasar extends Algorithm {
-
+	
 	@Override
-	public byte[] enc(String path,int key,  byte[] plaintext) {
+	public byte[] enc(byte[] plaintext) {
+		int key=getNewKey();
 		long startTime = System.nanoTime();
 		notifyObservers("start Ceasar encryption");
 		byte[] ans=plaintext;
@@ -18,7 +19,8 @@ public class Ceasar extends Algorithm {
 	}
 	
 	@Override
-	public byte[] dec(String path,int key, byte[] plaintext) {
+	public byte[] dec( byte[] plaintext) {
+		int key=getKeyFromUser();
 		long startTime = System.nanoTime();
 		notifyObservers("start Ceasar decryption");
 		byte[] ans;

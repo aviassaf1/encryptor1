@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Random;
 
 public class Cmd implements Observer{
 
@@ -35,7 +34,18 @@ public class Cmd implements Observer{
 				}
 				path=getFilePath();
 				int algoNum=chooseAlgorithm();
-				activateAlgo(enc,algoNum,path);
+				try{
+					byte[]plaintext = FileEncryptor.getFileBytes(path);
+					byte[] ans=activateAlgo(plaintext, enc,algoNum);
+					if(enc){
+						FileEncryptor.saveEncFile(path,ans);
+					}
+					else{
+						FileEncryptor.saveDecFile(path,ans);
+					}
+				} catch (IOException e) {
+					System.err.println("there was a problem to get "+path+" please try another path");
+				}
 				done=true;
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -43,128 +53,131 @@ public class Cmd implements Observer{
 		}
 	}
 
-	private static void activateAlgo(boolean enc, int algoNum,String path) {
+	private static byte[] activateAlgo(byte[] plaintext, boolean enc, int algoNum) {
 		Cmd cmd=new Cmd(); 
-		byte[] plaintext;
-		if(algoNum<1||algoNum>3)
-			return;
-		try {
-			plaintext = FileEncryptor.getFileBytes(path);
-			byte[] ans = null;
-			if(enc){
-				if(algoNum==1){
-					int key=getNewKey();
-					Ceasar ceasar= new Ceasar();
-					ceasar.addObserver(cmd);
-					ans=ceasar.enc(path,key,plaintext);
-				}
-				else if(algoNum==2){
-					int key=getNewKey();
-					Xor xor= new Xor();
-					xor.addObserver(cmd);
-					ans=xor.enc(path,key,plaintext);
-				}
-				else if(algoNum==3){
-					int key=getNewMulKey();
-					Multiplication multiplication= new Multiplication();
-					multiplication.addObserver(cmd);
-					ans=multiplication.enc(path,key,plaintext);
-				}
-				FileEncryptor.saveEncFile(path,ans);
+		if(algoNum<1||algoNum>6)
+			return null;
+		byte[] ans = null;
+		if(enc){
+			if(algoNum==1){
+				Ceasar ceasar= new Ceasar();
+				ceasar.addObserver(cmd);
+				ans=ceasar.enc(plaintext);
 			}
-			else{
-				if(algoNum==1){
-					int key=getKeyFromUser();
-					Ceasar ceasar= new Ceasar();
-					ceasar.addObserver(cmd);
-					ans=ceasar.dec(path,key,plaintext);
-				}
-				else if(algoNum==2){
-					int key=getKeyFromUser();
-					Xor xor= new Xor();
-					xor.addObserver(cmd);
-					ans=xor.dec(path,key,plaintext);
-				}
-				else if(algoNum==3){
-					boolean goodKey=false;
-					while(!goodKey)
-					{
-						int key=getKeyMulFromUser();
-						try {
-							Multiplication multiplication= new Multiplication();
-							multiplication.addObserver(cmd);
-							ans=multiplication.dec(path,key,plaintext);
-							goodKey=true;
-						} catch (IlegalKeyException e) {
-							System.err.println("there was a problem with the key, please try another key");
-						}
+			else if(algoNum==2){
+				Xor xor= new Xor();
+				xor.addObserver(cmd);
+				ans=xor.enc(plaintext);
+			}
+			else if(algoNum==3){
+				Multiplication multiplication= new Multiplication();
+				multiplication.addObserver(cmd);
+				ans=multiplication.enc(plaintext);
+			}
+			else if (algoNum==4) {
+				System.out.println("now choose the first ans second algorithm");
+				System.out.println("choosing the first algorithm:");
+				int alg1Num=chooseAlgorithm();
+				System.out.println("Choosing the second algorithm:");
+				int alg2Num=chooseAlgorithm();
+				ans=activateAlgo(activateAlgo(plaintext, enc, alg1Num), enc, alg2Num);
+			}
+			else if(algoNum==5){
+				System.out.println("Choosing the revers algorithm:");
+				int algNum=chooseAlgorithm();
+				ans=activateAlgo(plaintext, !enc, algNum);
+			}
+			else if(algoNum==6){
+				System.out.println("Choosing the split algorithm:");
+				int algNum=chooseAlgorithm();
+				System.out.println("The first split key:");
+				byte[] ans1=activateAlgo(plaintext, enc, algNum);
+				System.out.println("The second split key:");
+				byte[] ans2=activateAlgo(plaintext, enc, algNum);
+				ans=new byte[ans2.length];
+				for (int i = 0; i < ans.length; i++) {
+					if(i%2!=0){
+						ans[i]=ans1[i];
+					}
+					else{
+						ans[i]=ans2[i];
 					}
 				}
-				FileEncryptor.saveDecFile(path,ans);
 			}
-		} catch (IOException e) {
-			System.err.println("there was a problem to get "+path+" please try another path");
 		}
+		else{
+			if(algoNum==1){
+				Ceasar ceasar= new Ceasar();
+				ceasar.addObserver(cmd);
+				ans=ceasar.dec(plaintext);
+			}
+			else if(algoNum==2){
+				Xor xor= new Xor();
+				xor.addObserver(cmd);
+				ans=xor.dec(plaintext);
+			}
+			else if(algoNum==3){
+				Multiplication multiplication= new Multiplication();
+				multiplication.addObserver(cmd);
+				ans=multiplication.dec(plaintext);
+			}
+			else if (algoNum==4) {
+				System.out.println("now choose the first ans second algorithm");
+				System.out.println("choosing the first algorithm:");
+				int alg1Num=chooseAlgorithm();
+				System.out.println("choosing the second algorithm:");
+				int alg2Num=chooseAlgorithm();
+				ans=activateAlgo(activateAlgo(plaintext, enc, alg2Num), enc, alg1Num);
+			}
+			else if(algoNum==5){
+				System.out.println("choosing the revers algorithm:");
+				int algNum=chooseAlgorithm();
+				ans=activateAlgo(plaintext, !enc, algNum);
+			}
+			else if(algoNum==6){
+				System.out.println("Choosing the split algorithm:");
+				int algNum=chooseAlgorithm();
+				System.out.println("Choosing the first split key:");
+				byte[] ans1=activateAlgo(plaintext, enc, algNum);
+				System.out.println("Choosing the second split key:");
+				byte[] ans2=activateAlgo(plaintext, enc, algNum);
+				ans=new byte[ans2.length];
+				for (int i = 0; i < ans.length; i++) {
+					if(i%2!=0){
+						ans[i]=ans1[i];
+					}
+					else{
+						ans[i]=ans2[i];
+					}
+				}
+			}
+		}
+		return ans;
 	}
 
 	private static int chooseAlgorithm() {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		System.out.println("please choose the encyption  algorithm:");	
-		System.out.println("(1) Ceaser, (2) Xor, (3) Multiplicayion");
+		System.out.println("(1) Ceaser, (2) Xor, (3) Multiplicayion, (4) Double, (5) Reverse, (6) Split");
 		boolean enteredNum=false;
 		int num=0;
 		while(!enteredNum){
 			try {
 				num = Integer.parseInt(br.readLine());
-				if(num<1||num>3){
-					System.out.println("please enter number (1-3):");
+				if(num<1||num>6){
+					System.out.println("please enter number (1-6):");
 				}
 				else{
 					enteredNum=true;
 				}
 			} catch (Exception e) {
-				System.out.println("please enter number (1-3):");
-			}
-		}
-		return num;
-	}
-
-	private static int getKeyFromUser() {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		System.out.println("please enter your key:");
-		boolean enteredNum=false;
-		int num=0;
-		while(!enteredNum){
-			try {
-				num = Integer.parseInt(br.readLine());
-				enteredNum=true;
-			} catch (Exception e) {
-				System.out.println("please enter your key (key should be a number):");
+				System.out.println("please enter number (1-6):");
 			}
 		}
 		return num;
 	}
 	
-	private static int getKeyMulFromUser() {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		System.out.println("please enter your key:");
-		boolean enteredNum=false;
-		int num=0;
-		while(!enteredNum){
-			try {
-				num = Integer.parseInt(br.readLine());
-				if(num%2==0){
-					System.out.println("please enter your key (key should be an odd number):");
-				}
-				else{
-					enteredNum=true;
-				}
-			} catch (Exception e) {
-				System.out.println("please enter your key (key should be an odd number):");
-			}
-		}
-		return num;
-	}
+	
 
 	private static String getFilePath() throws IOException {
 		boolean pathExist=false;
@@ -184,21 +197,7 @@ public class Cmd implements Observer{
 		return path;
 	}
 
-	private static int getNewKey() {
-		Random rnd=new Random();
-		int key=rnd.nextInt(255);
-		System.out.println("The key is: "+key );
-		return key;
-	}
-	private static int getNewMulKey() {
-		Random rnd=new Random();
-		int key=0;
-		while(key%2==0||key==0){//may not need ==0
-			key=rnd.nextInt(255);
-		}
-		System.out.println("The key is: "+key );
-		return key;
-	}
+	
 
 	public void update(Observable o, Object arg) {
 		System.out.println(arg);

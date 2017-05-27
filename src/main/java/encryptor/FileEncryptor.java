@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import javax.imageio.IIOException;
-
 public class FileEncryptor {
 	
 	protected static byte[] getFileBytes(String path) throws IOException {
