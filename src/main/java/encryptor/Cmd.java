@@ -4,8 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.Random;
 
 public class Cmd {
 
@@ -15,7 +14,6 @@ public class Cmd {
 		String path="";
 		boolean chooseEncOrDec=false;
 		boolean done=false;
-		byte[] ans=new byte[0];
 		while(!done){
 			try {
 				System.out.println("hello, please choose enryption(E) or decription(D)");
@@ -24,13 +22,15 @@ public class Cmd {
 					if(line.equals("E")){
 						chooseEncOrDec=true;
 						path=getFilePath();
-						ans=enc1(path);
+						int key=getNewKey();
+						Ceasar.enc1(path,key);
 						done=true;
 					}
 					else if(line.equals("D")){
 						chooseEncOrDec=true;
 						path=getFilePath();
-						ans=dec1(path);
+						int key=getKeyFomUser();
+						Ceasar.dec1(path,key);
 						done=true;
 					}
 					else{
@@ -41,9 +41,22 @@ public class Cmd {
 				e.printStackTrace();
 			}
 		}
-		for(int i=0;i<ans.length;i++){
-			System.out.println(ans[i]);
+	}
+
+	private static int getKeyFomUser() {
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		System.out.println("please enter your key:");
+		boolean enteredNum=false;
+		int num=0;
+		while(!enteredNum){
+			try {
+				num = Integer.parseInt(br.readLine());
+				enteredNum=true;
+			} catch (Exception e) {
+				System.out.println("please enter your key (key should be a number):");
+			}
 		}
+		return num;
 	}
 
 	private static String getFilePath() throws IOException {
@@ -64,23 +77,11 @@ public class Cmd {
 		return path;
 	}
 
-	private static byte[] enc1(String path) {
-		return getFileBytes(path);
+	private static int getNewKey() {
+		Random rnd=new Random();
+		int key=rnd.nextInt(255);
+		System.out.println("The key is: "+key );
+		return key;
 	}
-	private static byte[] dec1(String path) {
-		return getFileBytes(path);
-	}
-	private static byte[] getFileBytes(String path) {
-		byte[] byts=new byte[0];
-		try {
-			byts = Files.readAllBytes(Paths.get(path));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		byte[] ans=new byte[byts.length];
-		for(int i=0;i<byts.length;i++){
-			ans[i]=byts[i];
-		}
-		return ans;
-	}
+	
 }
