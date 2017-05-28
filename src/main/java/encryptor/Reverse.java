@@ -9,6 +9,7 @@ public class Reverse extends Algorithm {
 	@Override
 	protected byte[] encImpl(byte[] plaintext) throws IlegalKeyException {
 		long startTime = System.nanoTime();
+		notifyObservers("start Reverse encryption");
 		byte[] ans= alg.decImpl(plaintext);
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime);
@@ -19,6 +20,7 @@ public class Reverse extends Algorithm {
 	@Override
 	protected byte[] decImpl(byte[] plaintext) throws IlegalKeyException {
 		long startTime = System.nanoTime();
+		notifyObservers("start Reverse decryption");
 		byte[] ans= alg.encImpl(plaintext);
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime);

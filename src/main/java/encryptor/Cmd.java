@@ -64,16 +64,14 @@ public class Cmd implements Observer{
 			try {
 				alg.enc(plaintext);
 			} catch (IlegalKeyException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.err.println("There was problem with the key");
 			}
 		}
 		else{
 			try {
 				alg.dec(plaintext);
 			} catch (IlegalKeyException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				System.err.println("The key is illegal");
 			}
 		}
 		return ans;

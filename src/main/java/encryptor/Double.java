@@ -11,6 +11,7 @@ public class Double extends Algorithm {
 	@Override
 	protected byte[] encImpl(byte[] plaintext) throws IlegalKeyException {
 		long startTime = System.nanoTime();
+		notifyObservers("start Double encryption");
 		byte[] ans1= alg1.encImpl(plaintext);
 		byte[] ans= alg2.encImpl(ans1);
 		long endTime = System.nanoTime();
@@ -22,6 +23,7 @@ public class Double extends Algorithm {
 	@Override
 	protected byte[] decImpl(byte[] plaintext) throws IlegalKeyException {
 		long startTime = System.nanoTime();
+		notifyObservers("start Double decryption");
 		byte[] ans1= alg2.decImpl(plaintext);
 		byte[] ans= alg1.decImpl(ans1);
 		long endTime = System.nanoTime();

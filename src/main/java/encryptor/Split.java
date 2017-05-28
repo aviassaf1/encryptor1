@@ -11,14 +11,15 @@ public class Split extends Algorithm {
 	@Override
 	protected byte[] encImpl(byte[] plaintext) throws IlegalKeyException {
 		long startTime = System.nanoTime();
-		byte[] ans1= alg1.encImpl(plaintext);
-		byte[] ans2= alg2.encImpl(plaintext);//may be problem oop (copy plain text)
-		byte[] ans=new byte[ans2.length];
+		notifyObservers("start Split encryption");
+		byte[] plaintext2=new byte[plaintext.length];
+		for (int i = 0; i < plaintext.length; i++) {
+			plaintext2[i]=plaintext[i];
+		}
+		byte[] ans= alg1.encImpl(plaintext);
+		byte[] ans2= alg2.encImpl(plaintext2);
 		for (int i = 0; i < ans.length; i++) {
-			if(i%2!=0){
-				ans[i]=ans1[i];
-			}
-			else{
+			if(i%2==0){
 				ans[i]=ans2[i];
 			}
 		}
@@ -31,14 +32,15 @@ public class Split extends Algorithm {
 	@Override
 	protected byte[] decImpl(byte[] plaintext) throws IlegalKeyException {
 		long startTime = System.nanoTime();
-		byte[] ans1= alg1.decImpl(plaintext);
-		byte[] ans2= alg2.decImpl(plaintext);//may be problem oop (copy plain text)
-		byte[] ans=new byte[ans2.length];
+		notifyObservers("start Split decryption");
+		byte[] plaintext2=new byte[plaintext.length];
+		for (int i = 0; i < plaintext.length; i++) {
+			plaintext2[i]=plaintext[i];
+		}
+		byte[] ans= alg1.decImpl(plaintext);
+		byte[] ans2= alg2.decImpl(plaintext2);
 		for (int i = 0; i < ans.length; i++) {
-			if(i%2!=0){
-				ans[i]=ans1[i];
-			}
-			else{
+			if(i%2==0){
 				ans[i]=ans2[i];
 			}
 		}
