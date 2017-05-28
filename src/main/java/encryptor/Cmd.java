@@ -33,7 +33,7 @@ public class Cmd implements Observer{
 						System.out.println("please choose only one of the options enryption(E) or decription(D)");
 					}
 				}
-				path=getFilePath();
+				path=getFilePath(false);
 				int algoNum=chooseAlgorithm();
 				try{
 					byte[]plaintext = FileEncryptor.getFileBytes(path);
@@ -64,7 +64,7 @@ public class Cmd implements Observer{
 		Boolean done=false;
 		if(enc){
 			try {
-				String keyPath=getFilePath();
+				String keyPath=getFilePath(true);
 				alg.enc(plaintext,keyPath);
 				done=true;
 			} catch (IlegalKeyException e) {
@@ -77,7 +77,7 @@ public class Cmd implements Observer{
 			while(!done){
 				try {
 					try {
-						String keyPath=getFilePath();
+						String keyPath=getFilePath(false);
 						List<Integer> keys=FileEncryptor.getKeys(keyPath);
 						alg.dec(plaintext,keys);
 						done=true;
@@ -147,7 +147,7 @@ public class Cmd implements Observer{
 	
 	
 
-	private static String getFilePath() {
+	private static String getFilePath(Boolean isDirectory) {
 		boolean pathExist=false;
 		String path="";
 		BufferedReader buffer=new BufferedReader(new InputStreamReader(System.in));
@@ -156,14 +156,24 @@ public class Cmd implements Observer{
 			try {
 				path=buffer.readLine();
 				File f = new File(path);
-				if(f.exists() && !f.isDirectory()) { 
+				if(f.exists() && (f.isDirectory()==isDirectory)) { 
 				   pathExist=true;
+				}
+				else{
+					if(isDirectory){
+						System.out.println("the path you enterd is not a correct folder path, please try again:");
+					}
+					else{
+						System.out.println("the path you enterd is not a correct file path, please try again:");
+					}
+				}
+			} catch (IOException e) {
+				if(isDirectory){
+					System.out.println("the path you enterd is not a correct folder path, please try again:");
 				}
 				else{
 					System.out.println("the path you enterd is not a correct file path, please try again:");
 				}
-			} catch (IOException e) {
-				System.out.println("the path you enterd is not a correct file path, please try again:");
 			}
 		}
 		return path;

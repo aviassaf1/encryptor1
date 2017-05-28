@@ -61,7 +61,7 @@ public class FileEncryptor {
         return keys;
 	}
 	public static void saveKeyToFile(String keysPath, int key) throws IOException {
-		FileOutputStream out = new FileOutputStream(keysPath);
+		FileOutputStream out = new FileOutputStream(keysPath+"\\key.bin");
 		out.write(key);
 		byte [] line= {'\n'};
 		out.write(line);
