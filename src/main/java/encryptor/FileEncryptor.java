@@ -1,6 +1,7 @@
 package encryptor;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -64,6 +65,18 @@ public class FileEncryptor {
 	public static void saveKeyToFile(String keysPath, int key) throws IOException {
 		PrintWriter out = new PrintWriter(new FileOutputStream(keysPath+"\\key.bin",true));
 		out.println(""+key);
+		out.close();
+	}
+	public static void saveEncFiles(File f, byte[] enc) throws IOException {
+		FileOutputStream out;
+		out = new FileOutputStream(f.getParent()+"\\encrypted\\"+f.getName());
+		out.write(enc);
+		out.close();
+	}
+	public static void saveDecFiles(File f, byte[] dec) throws IOException {
+		FileOutputStream out;
+		out = new FileOutputStream(f.getParent()+"\\decrypted\\"+f.getName());
+		out.write(dec);
 		out.close();
 	}
 }

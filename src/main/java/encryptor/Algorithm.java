@@ -12,12 +12,12 @@ public abstract class Algorithm extends Observable {
 	protected abstract void beforeEnc(String keysPath)throws IOException ;
 	protected abstract void beforeDec(List<Integer> keys)throws IlegalKeyException ;
 	
-	public byte[] enc(byte[] plaintext,String keysPath)throws IlegalKeyException,IOException {
-		beforeEnc(keysPath);
+	public byte[] enc(byte[] plaintext/*,String keysPath*/)throws IlegalKeyException,IOException {
+		//beforeEnc(keysPath);
 		return encImpl(plaintext);
 	}
-	public byte[] dec(byte[] plaintext, List<Integer> keys)throws IlegalKeyException {
-		beforeDec(keys);
+	public byte[] dec(byte[] plaintext/*, List<Integer> keys*/)throws IlegalKeyException {
+		//beforeDec(keys);
 		return decImpl(plaintext);
 	}
 	
