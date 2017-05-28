@@ -1,10 +1,9 @@
 package encryptor;
 
 public class Xor extends Algorithm {
-	
+	private int key;
 	@Override
-	public byte[] enc(byte[] plaintext) {
-		int key=getNewKey();
+	protected byte[] encImpl(byte[] plaintext) {
 		long startTime = System.nanoTime();
 		notifyObservers("start xor encryption");
 		byte[] ans;
@@ -19,8 +18,7 @@ public class Xor extends Algorithm {
 	}
 
 	@Override
-	public byte[] dec(byte[] plaintext) {
-		int key=getKeyFromUser();;
+	protected byte[] decImpl(byte[] plaintext) {
 		long startTime = System.nanoTime();
 		notifyObservers("start xor decryption");
 		byte[] ans;
@@ -32,6 +30,16 @@ public class Xor extends Algorithm {
 		long duration = (endTime - startTime);
 		notifyObservers("stop xor decryption and took: " +duration);
 		return ans;
+	}
+	
+	@Override
+	protected void beforeEnc(){
+		key=getNewKey();
+	}
+
+	@Override
+	protected void beforeDec() {
+		key=getKeyFromUser();
 	}
 
 }

@@ -2,10 +2,9 @@ package encryptor;
 
 public class Multiplication extends Algorithm {
 
-
+	private int key;
 	@Override
-	public byte[]  enc(byte[] plaintext) {
-		int key=getNewMulKey();
+	protected byte[]  encImpl(byte[] plaintext) {
 		long startTime = System.nanoTime();
 		notifyObservers("start Multiplication encryption");
 		byte[] ans;
@@ -20,8 +19,7 @@ public class Multiplication extends Algorithm {
 	}
 
 	@Override
-	public byte[] dec(byte[] plaintext) {
-		int key=getKeyMulFromUser();
+	protected byte[] decImpl(byte[] plaintext) {
 		boolean goodKey=false;
 		while(!goodKey)
 		{
@@ -60,5 +58,14 @@ public class Multiplication extends Algorithm {
 			}
 		}
 		return b;
+	}
+	@Override
+	protected void beforeEnc(){
+		key=getNewMulKey();
+	}
+
+	@Override
+	protected void beforeDec() {
+		key=getKeyMulFromUser();
 	}
 }

@@ -6,8 +6,22 @@ import java.util.Observable;
 import java.util.Random;
 
 public abstract class Algorithm extends Observable {
-	public abstract byte[] enc(byte[] plaintext)throws IlegalKeyException ;
-	public abstract byte[] dec(byte[] plaintext)throws IlegalKeyException ;
+
+	protected abstract byte[] encImpl(byte[] plaintext)throws IlegalKeyException ;
+	protected abstract byte[] decImpl(byte[] plaintext)throws IlegalKeyException ;
+	protected abstract void beforeEnc() ;
+	protected abstract void beforeDec() ;
+	
+	public byte[] enc(byte[] plaintext)throws IlegalKeyException {
+		beforeEnc();
+		return encImpl(plaintext);
+	}
+	public byte[] dec(byte[] plaintext)throws IlegalKeyException {
+		beforeDec();
+		return decImpl(plaintext);
+	}
+	
+	
 	
 	protected static int getKeyFromUser() {
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));

@@ -58,101 +58,56 @@ public class Cmd implements Observer{
 		if(algoNum<1||algoNum>6)
 			return null;
 		byte[] ans = null;
+		Algorithm alg=getAlgorithmFromNum(algoNum);
+		alg.addObserver(cmd);
 		if(enc){
-			if(algoNum==1){
-				Ceasar ceasar= new Ceasar();
-				ceasar.addObserver(cmd);
-				ans=ceasar.enc(plaintext);
-			}
-			else if(algoNum==2){
-				Xor xor= new Xor();
-				xor.addObserver(cmd);
-				ans=xor.enc(plaintext);
-			}
-			else if(algoNum==3){
-				Multiplication multiplication= new Multiplication();
-				multiplication.addObserver(cmd);
-				ans=multiplication.enc(plaintext);
-			}
-			else if (algoNum==4) {
-				System.out.println("now choose the first ans second algorithm");
-				System.out.println("choosing the first algorithm:");
-				int alg1Num=chooseAlgorithm();
-				System.out.println("Choosing the second algorithm:");
-				int alg2Num=chooseAlgorithm();
-				ans=activateAlgo(activateAlgo(plaintext, enc, alg1Num), enc, alg2Num);
-			}
-			else if(algoNum==5){
-				System.out.println("Choosing the revers algorithm:");
-				int algNum=chooseAlgorithm();
-				ans=activateAlgo(plaintext, !enc, algNum);
-			}
-			else if(algoNum==6){
-				System.out.println("Choosing the split algorithm:");
-				int algNum=chooseAlgorithm();
-				System.out.println("The first split key:");
-				byte[] ans1=activateAlgo(plaintext, enc, algNum);
-				System.out.println("The second split key:");
-				byte[] ans2=activateAlgo(plaintext, enc, algNum);
-				ans=new byte[ans2.length];
-				for (int i = 0; i < ans.length; i++) {
-					if(i%2!=0){
-						ans[i]=ans1[i];
-					}
-					else{
-						ans[i]=ans2[i];
-					}
-				}
+			try {
+				alg.enc(plaintext);
+			} catch (IlegalKeyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		else{
-			if(algoNum==1){
-				Ceasar ceasar= new Ceasar();
-				ceasar.addObserver(cmd);
-				ans=ceasar.dec(plaintext);
-			}
-			else if(algoNum==2){
-				Xor xor= new Xor();
-				xor.addObserver(cmd);
-				ans=xor.dec(plaintext);
-			}
-			else if(algoNum==3){
-				Multiplication multiplication= new Multiplication();
-				multiplication.addObserver(cmd);
-				ans=multiplication.dec(plaintext);
-			}
-			else if (algoNum==4) {
-				System.out.println("now choose the first ans second algorithm");
-				System.out.println("choosing the first algorithm:");
-				int alg1Num=chooseAlgorithm();
-				System.out.println("choosing the second algorithm:");
-				int alg2Num=chooseAlgorithm();
-				ans=activateAlgo(activateAlgo(plaintext, enc, alg2Num), enc, alg1Num);
-			}
-			else if(algoNum==5){
-				System.out.println("choosing the revers algorithm:");
-				int algNum=chooseAlgorithm();
-				ans=activateAlgo(plaintext, !enc, algNum);
-			}
-			else if(algoNum==6){
-				System.out.println("Choosing the split algorithm:");
-				int algNum=chooseAlgorithm();
-				System.out.println("Choosing the first split key:");
-				byte[] ans1=activateAlgo(plaintext, enc, algNum);
-				System.out.println("Choosing the second split key:");
-				byte[] ans2=activateAlgo(plaintext, enc, algNum);
-				ans=new byte[ans2.length];
-				for (int i = 0; i < ans.length; i++) {
-					if(i%2!=0){
-						ans[i]=ans1[i];
-					}
-					else{
-						ans[i]=ans2[i];
-					}
-				}
+			try {
+				alg.dec(plaintext);
+			} catch (IlegalKeyException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 		return ans;
+	}
+
+	private static Algorithm getAlgorithmFromNum(int algoNum) {
+		switch (algoNum) {
+		case 1:
+			return new Ceasar();
+		case 2:
+			return new Xor();
+		case 3:
+			return new Multiplication();
+		case 4:
+			System.out.println("now choose the first ans second algorithm");
+			System.out.println("choosing the first algorithm:");
+			Algorithm alg1=getAlgorithmFromNum(chooseAlgorithm());
+			System.out.println("choosing the second algorithm:");
+			Algorithm alg2=getAlgorithmFromNum(chooseAlgorithm());
+			return new Double(alg1, alg2);
+		case 5:
+			System.out.println("choosing the reverse algorithm:");
+			Algorithm alg=getAlgorithmFromNum(chooseAlgorithm());
+			return new Reverse(alg);
+		case 6:
+			System.out.println("now choose the first ans second algorithm");
+			System.out.println("choosing the first algorithm:");
+			Algorithm alg3=getAlgorithmFromNum(chooseAlgorithm());
+			System.out.println("choosing the second algorithm:");
+			Algorithm alg4=getAlgorithmFromNum(chooseAlgorithm());
+			return new Split(alg3, alg4);
+		default:
+			return new Ceasar();
+		}
 	}
 
 	private static int chooseAlgorithm() {
@@ -196,8 +151,6 @@ public class Cmd implements Observer{
 		}
 		return path;
 	}
-
-	
 
 	public void update(Observable o, Object arg) {
 		System.out.println(arg);
