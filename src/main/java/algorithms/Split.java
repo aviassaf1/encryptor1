@@ -1,7 +1,9 @@
-package encryptor;
+package algorithms;
 
 import java.io.IOException;
 import java.util.List;
+
+import algorithms.exceptions.IlegalKeyException;
 
 public class Split extends Algorithm {
 
@@ -60,13 +62,13 @@ public class Split extends Algorithm {
 	}
 
 	@Override
-	protected void beforeEnc(String keysPath)throws IOException {
+	public void beforeEnc(String keysPath)throws IOException {
 		alg1.beforeEnc(keysPath);
 		alg2.beforeEnc(keysPath);
 	}
 
 	@Override
-	protected void beforeDec(List<Integer> keys)throws IlegalKeyException {
+	public void beforeDec(List<Integer> keys)throws IlegalKeyException {
 		alg1.beforeDec(keys);
 		alg2.beforeDec(keys);
 	}

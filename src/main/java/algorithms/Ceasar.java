@@ -1,7 +1,9 @@
-package encryptor;
+package algorithms;
 
 import java.io.IOException;
 import java.util.List;
+
+import encryptor.FileEncryptor;
 
 public class Ceasar extends Algorithm {
 	private int key;

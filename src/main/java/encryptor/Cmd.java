@@ -11,6 +11,15 @@ import java.util.Observer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import algorithms.Algorithm;
+import algorithms.Ceasar;
+import algorithms.Double;
+import algorithms.Multiplication;
+import algorithms.Reverse;
+import algorithms.Split;
+import algorithms.Xor;
+import algorithms.exceptions.IlegalKeyException;
+
 public class Cmd implements Observer{
 
 	public static void main(String[] args) {

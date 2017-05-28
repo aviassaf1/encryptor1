@@ -1,4 +1,4 @@
-package encryptor;
+package algorithms.exceptions;
 
 public class IlegalKeyException extends Exception {
 

@@ -1,16 +1,18 @@
-package encryptor;
+package algorithms;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Observable;
 import java.util.Random;
 
+import algorithms.exceptions.IlegalKeyException;
+
 public abstract class Algorithm extends Observable {
 
 	protected abstract byte[] encImpl(byte[] plaintext) throws IlegalKeyException;
 	protected abstract byte[] decImpl(byte[] plaintext)throws IlegalKeyException ;
-	protected abstract void beforeEnc(String keysPath)throws IOException ;
-	protected abstract void beforeDec(List<Integer> keys)throws IlegalKeyException ;
+	public abstract void beforeEnc(String keysPath)throws IOException ;
+	public abstract void beforeDec(List<Integer> keys)throws IlegalKeyException ;
 	
 	public byte[] enc(byte[] plaintext/*,String keysPath*/)throws IlegalKeyException,IOException {
 		//beforeEnc(keysPath);

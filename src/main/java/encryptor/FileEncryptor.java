@@ -11,6 +11,8 @@ import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
 
+import algorithms.exceptions.IlegalKeyException;
+
 public class FileEncryptor {
 	
 	protected static byte[] getFileBytes(String path) throws IOException {

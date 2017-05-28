@@ -1,7 +1,9 @@
-package encryptor;
+package algorithms;
 
 import java.io.IOException;
 import java.util.List;
+
+import algorithms.exceptions.IlegalKeyException;
 
 public class Reverse extends Algorithm {
 

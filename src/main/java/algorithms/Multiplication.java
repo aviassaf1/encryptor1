@@ -1,7 +1,10 @@
-package encryptor;
+package algorithms;
 
 import java.io.IOException;
 import java.util.List;
+
+import algorithms.exceptions.IlegalKeyException;
+import encryptor.FileEncryptor;
 
 public class Multiplication extends Algorithm {
 
@@ -65,13 +68,13 @@ public class Multiplication extends Algorithm {
 		return b;
 	}
 	@Override
-	protected void beforeEnc(String keysPath) throws IOException{
+	public void beforeEnc(String keysPath) throws IOException{
 		key=getNewMulKey();
 		FileEncryptor.saveKeyToFile(keysPath,key);
 	}
 
 	@Override
-	protected void beforeDec(List<Integer> keys)throws IlegalKeyException  {
+	public void beforeDec(List<Integer> keys)throws IlegalKeyException  {
 		//key=getKeyMulFromUser();
 		key=keys.get(0);
 		if(key%2==0){
