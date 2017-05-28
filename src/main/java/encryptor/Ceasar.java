@@ -41,12 +41,9 @@ public class Ceasar extends Algorithm {
 	}
 
 	@Override
-	public void beforeDec(List<Integer> keys) throws IlegalKeyException {
+	public void beforeDec(List<Integer> keys){
 		//key=getKeyFromUser();
 		key=keys.get(0);
-		if(key%2==0){
-			throw new IlegalKeyException("The key in file is ilegal");
-		}
 		keys.remove(0);
 	}
 	

@@ -65,9 +65,12 @@ public class Multiplication extends Algorithm {
 	}
 
 	@Override
-	protected void beforeDec(List<Integer> keys) {
+	protected void beforeDec(List<Integer> keys)throws IlegalKeyException  {
 		//key=getKeyMulFromUser();
 		key=keys.get(0);
+		if(key%2==0){
+			throw new IlegalKeyException("The key in file is ilegal");
+		}
 		keys.remove(0);
 	}
 }

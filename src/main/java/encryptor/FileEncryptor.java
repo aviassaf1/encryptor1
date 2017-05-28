@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.LinkedList;
@@ -50,7 +51,7 @@ public class FileEncryptor {
         while ((line = in.readLine()) != null) {
             int key;
 			try {
-				key = Integer.getInteger(line);
+				key = Integer.parseInt(line);
 			} catch (Exception e) {
 				in.close();
 				throw new IlegalKeyException("one of the keys wasnt valid key");
@@ -61,10 +62,8 @@ public class FileEncryptor {
         return keys;
 	}
 	public static void saveKeyToFile(String keysPath, int key) throws IOException {
-		FileOutputStream out = new FileOutputStream(keysPath+"\\key.bin");
-		out.write(key);
-		byte [] line= {'\n'};
-		out.write(line);
+		PrintWriter out = new PrintWriter(keysPath+"\\key.bin");
+		out.println(""+key);
 		out.close();
 	}
 }

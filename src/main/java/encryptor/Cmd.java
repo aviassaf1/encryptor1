@@ -65,7 +65,7 @@ public class Cmd implements Observer{
 		if(enc){
 			try {
 				String keyPath=getFilePath(true);
-				alg.enc(plaintext,keyPath);
+				ans= alg.enc(plaintext,keyPath);
 				done=true;
 			} catch (IlegalKeyException e) {
 				System.err.println("There was problem with the key");
@@ -79,7 +79,7 @@ public class Cmd implements Observer{
 					try {
 						String keyPath=getFilePath(false);
 						List<Integer> keys=FileEncryptor.getKeys(keyPath);
-						alg.dec(plaintext,keys);
+						ans= alg.dec(plaintext,keys);
 						done=true;
 					} catch (IOException e) {
 						System.err.println("there was a problem with keys file, please try again");
