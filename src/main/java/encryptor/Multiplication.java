@@ -9,6 +9,7 @@ public class Multiplication extends Algorithm {
 	@Override
 	protected byte[]  encImpl(byte[] plaintext) {
 		long startTime = System.nanoTime();
+		setChanged();
 		notifyObservers("start Multiplication encryption");
 		byte[] ans;
 		ans = plaintext;
@@ -17,7 +18,9 @@ public class Multiplication extends Algorithm {
 		}	
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime);
-		notifyObservers("finish Multiplication encryption and took: " +duration);
+		double seconds = (double)duration / 1000000000.0;
+		setChanged();
+		notifyObservers("finish Multiplication encryption and took: " +seconds+" seconds");
 		return ans;
 	}
 
@@ -27,6 +30,7 @@ public class Multiplication extends Algorithm {
 		while(!goodKey)
 		{
 				long startTime = System.nanoTime();
+				setChanged();
 				notifyObservers("start Multiplication decryption");
 				byte reversKey=findreversKey(key);
 				byte[] ans;
@@ -36,7 +40,9 @@ public class Multiplication extends Algorithm {
 				}	
 				long endTime = System.nanoTime();
 				long duration = (endTime - startTime);
-				notifyObservers("finish Multiplication decryption and took: " +duration);
+				double seconds = (double)duration / 1000000000.0;
+				setChanged();
+				notifyObservers("finish Multiplication decryption and took: " +seconds+" seconds");
 				return ans;
 		}
 		return null;

@@ -8,6 +8,7 @@ public class Ceasar extends Algorithm {
 	@Override
 	public byte[] encImpl(byte[] plaintext) {
 		long startTime = System.nanoTime();
+		setChanged();
 		notifyObservers("start Ceasar encryption");
 		byte[] ans=plaintext;
 		for (int i = 0; i < ans.length; i++) {
@@ -15,7 +16,9 @@ public class Ceasar extends Algorithm {
 		}
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime); 
-		notifyObservers("finish Ceasar encryption and took: " +duration);
+		double seconds = (double)duration / 1000000000.0;
+		setChanged();
+		notifyObservers("finish Ceasar encryption and took: " +seconds+" seconds");
 		return ans;
 	}
 	
@@ -30,7 +33,9 @@ public class Ceasar extends Algorithm {
 		}
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime);
-		notifyObservers("finish Ceasar decryption and took: " +duration);
+		double seconds = (double)duration / 1000000000.0;
+		setChanged();
+		notifyObservers("finish Ceasar decryption and took: " +seconds+" seconds");
 		return ans;
 	}
 

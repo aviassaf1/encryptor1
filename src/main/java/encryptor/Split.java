@@ -14,6 +14,7 @@ public class Split extends Algorithm {
 	@Override
 	protected byte[] encImpl(byte[] plaintext) throws IlegalKeyException{
 		long startTime = System.nanoTime();
+		setChanged();
 		notifyObservers("start Split encryption");
 		byte[] plaintext2=new byte[plaintext.length];
 		for (int i = 0; i < plaintext.length; i++) {
@@ -28,13 +29,16 @@ public class Split extends Algorithm {
 		}
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime);
-		notifyObservers("stop Split encryption and took: " +duration);
+		double seconds = (double)duration / 1000000000.0;
+		setChanged();
+		notifyObservers("stop Split encryption and took: " +seconds+" seconds");
 		return ans;
 	}
 
 	@Override
 	protected byte[] decImpl(byte[] plaintext)throws IlegalKeyException {
 		long startTime = System.nanoTime();
+		setChanged();
 		notifyObservers("start Split decryption");
 		byte[] plaintext2=new byte[plaintext.length];
 		for (int i = 0; i < plaintext.length; i++) {
@@ -49,7 +53,9 @@ public class Split extends Algorithm {
 		}
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime);
-		notifyObservers("stop Split decryption and took: " +duration);
+		double seconds = (double)duration / 1000000000.0;
+		setChanged();
+		notifyObservers("stop Split decryption and took: " +seconds+" seconds");
 		return ans;
 	}
 

@@ -43,10 +43,7 @@ public class Cmd implements Observer{
 				alg.addObserver(cmd);
 				if(enc){
 					try {
-						System.out.println("choosing the key file" );
-						String keyPath=getFilePath(true);
-						alg.beforeEnc(keyPath);
-						
+				
 						enc(alg);
 						
 					} catch (IlegalKeyException e) {
@@ -103,42 +100,102 @@ public class Cmd implements Observer{
 		System.out.println("choosing the file\\folder you would like to decrypt" );
 		String path=getFilePath(isDirectory);
 		if(!isDirectory){
-			byte[]plaintext = FileEncryptor.getFileBytes(path);
-			byte[]ans= alg.dec(plaintext);
-			FileEncryptor.saveDecFile(path,ans);
+			decOneFile(alg, path);
 		}else{
-			final List<File>GoodFiles=new LinkedList<File>();
-			File folder = new File(path);
-			File[] listOfFiles = folder.listFiles();
-			for (int i = 0; i < listOfFiles.length; i++) {
-				if (!listOfFiles[i].isDirectory()) {
-					GoodFiles.add(listOfFiles[i]);
-			    }
-			}
-			File theDir = new File(path+"\\decrypted");
-			if (!theDir.exists()){
-				theDir.mkdir();
-			}
-			
-			ExecutorService exec = Executors.newFixedThreadPool(GoodFiles.size());
-			for (int i = 0; i < GoodFiles.size(); i++) {
-				exec.execute(new Runnable() {
-					public void run() {
-						try {
-							FileEncryptor.saveDecFiles(GoodFiles.get((int) Thread.currentThread().getId()%GoodFiles.size()),
-									alg.dec(FileEncryptor.getFileBytes(
-											GoodFiles.get((int) Thread.currentThread().getId()%GoodFiles.size()).getPath())
-											));
-						} catch (IOException e) {
-							e.printStackTrace();
-						} catch (IlegalKeyException e) {
-							System.err.println("There was problem with the key");
-						}
-					}
-				});
-			}
-			exec.shutdown();
+			decFolder(alg, path);
 		}
+	}
+
+	private static void decFolder(final Algorithm alg, String path) throws IOException {
+		final List<File>GoodFiles=new LinkedList<File>();
+		File folder = new File(path);
+		File[] listOfFiles = folder.listFiles();
+		for (int i = 0; i < listOfFiles.length; i++) {
+			if (!listOfFiles[i].isDirectory()) {
+				GoodFiles.add(listOfFiles[i]);
+		    }
+		}
+		File theDir = new File(path+"\\decrypted");
+		if (!theDir.exists()){
+			theDir.mkdir();
+		}
+		
+		BufferedReader buffer=new BufferedReader(new InputStreamReader(System.in));
+		String line;
+		boolean chooseAsyncOrSync=false;
+		boolean sync=false;
+		System.out.println("please choose Async(A) or Sync(B):");
+		while(!chooseAsyncOrSync){
+			line=buffer.readLine();
+			if(line.equals("A")){
+				chooseAsyncOrSync=true;
+			}
+			else if(line.equals("B")){
+				chooseAsyncOrSync=true;
+				sync=true;
+			}
+			else{
+				System.out.println("please choose only one of the Async(A) or Sync(B)");
+			}
+		}
+		
+		if(sync){
+			decFolderSync(alg, GoodFiles);
+		}else{
+			decFolderAsync(alg, GoodFiles);
+		}
+	}
+
+	private static void decFolderAsync(final Algorithm alg, final List<File> GoodFiles) {
+		ExecutorService exec = Executors.newFixedThreadPool(GoodFiles.size());
+		long startTime = System.nanoTime();
+		for (int i = 0; i < GoodFiles.size(); i++) {
+			exec.execute(new Runnable() {
+				public void run() {
+					try {
+						FileEncryptor.saveDecFiles(GoodFiles.get((int) Thread.currentThread().getId()%GoodFiles.size()),
+								alg.dec(FileEncryptor.getFileBytes(
+										GoodFiles.get((int) Thread.currentThread().getId()%GoodFiles.size()).getPath())
+										));
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (IlegalKeyException e) {
+						System.err.println("There was problem with the key");
+					}
+				}
+			});
+		}
+		exec.shutdown();
+		long endTime = System.nanoTime();
+		long duration = (endTime - startTime);
+		double seconds = (double)duration / 1000000000.0;
+		System.err.println("finish async decryption and took: " +seconds+" seconds");
+	}
+
+	private static void decFolderSync(final Algorithm alg, final List<File> GoodFiles) {
+		long startTime = System.nanoTime();
+		for (int i = 0; i < GoodFiles.size(); i++) {
+			try {
+				FileEncryptor.saveDecFiles(GoodFiles.get(i),
+						alg.dec(FileEncryptor.getFileBytes(GoodFiles.get(i).getPath()))
+						);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (IlegalKeyException e) {
+				System.err.println("There was problem with the key");
+			}
+		}
+		long endTime = System.nanoTime();
+		long duration = (endTime - startTime);
+		double seconds = (double)duration / 1000000000.0;
+		System.err.println("finish sync decryption and took: " +seconds+" seconds");
+	}
+
+	
+	private static void decOneFile(final Algorithm alg, String path) throws IOException, IlegalKeyException {
+		byte[]plaintext = FileEncryptor.getFileBytes(path);
+		byte[]ans= alg.dec(plaintext);
+		FileEncryptor.saveDecFile(path,ans);
 	}
 
 	private static void enc(final Algorithm alg) throws IOException, IlegalKeyException {
@@ -164,43 +221,107 @@ public class Cmd implements Observer{
 		System.out.println("choosing the file\\folder you would like to encrypt" );
 		final String path=getFilePath(isDirectory);
 		if(!isDirectory){
-			byte[]plaintext = FileEncryptor.getFileBytes(path);
-			byte[]ans= alg.enc(plaintext);
-			FileEncryptor.saveEncFile(path,ans);
+			encOneFile(alg, path);
 		}else{
-			final List<File>GoodFiles=new LinkedList<File>();
-			File folder = new File(path);
-			File[] listOfFiles = folder.listFiles();
-			for (int i = 0; i < listOfFiles.length; i++) {
-				if (!listOfFiles[i].isDirectory()) {
-					GoodFiles.add(listOfFiles[i]);
-			    }
-			}
-			File theDir = new File(path+"\\encrypted");
-			if (!theDir.exists()){
-				theDir.mkdir();
-			}
-			
-			ExecutorService exec = Executors.newFixedThreadPool(GoodFiles.size());
-			for (int i = 0; i < GoodFiles.size(); i++) {
-				exec.execute(new Runnable() {
-					public void run() {
-						try {
-							FileEncryptor.saveEncFiles(GoodFiles.get((int) Thread.currentThread().getId()%GoodFiles.size()),
-									alg.enc(FileEncryptor.getFileBytes(
-											GoodFiles.get((int) Thread.currentThread().getId()%GoodFiles.size()).getPath())
-											));
-						} catch (IOException e) {
-							e.printStackTrace();
-						} catch (IlegalKeyException e) {
-							System.err.println("There was problem with the key");
-						}
-					}
-				});
-			}
-			exec.shutdown();
-			
+			encFolder(alg, path);
 		}
+	}
+
+	private static void encFolder(final Algorithm alg, final String path) throws IOException {
+		final List<File>GoodFiles=new LinkedList<File>();
+		File folder = new File(path);
+		File[] listOfFiles = folder.listFiles();
+		for (int i = 0; i < listOfFiles.length; i++) {
+			if (!listOfFiles[i].isDirectory()) {
+				GoodFiles.add(listOfFiles[i]);
+		    }
+		}
+		File theDir = new File(path+"\\encrypted");
+		if (!theDir.exists()){
+			theDir.mkdir();
+		}
+		alg.beforeEnc(path+"\\encrypted");
+		
+		
+		BufferedReader buffer=new BufferedReader(new InputStreamReader(System.in));
+		String line;
+		boolean chooseAsyncOrSync=false;
+		boolean sync=false;
+		System.out.println("please choose Async(A) or Sync(B):");
+		while(!chooseAsyncOrSync){
+			line=buffer.readLine();
+			if(line.equals("A")){
+				chooseAsyncOrSync=true;
+			}
+			else if(line.equals("B")){
+				chooseAsyncOrSync=true;
+				sync=true;
+			}
+			else{
+				System.out.println("please choose only one of the Async(A) or Sync(B)");
+			}
+		}
+		
+		if(sync){
+			encFolderSync(alg, GoodFiles);
+		}else{
+			encFolderAsync(alg, GoodFiles);
+		}
+	}
+
+	private static void encFolderAsync(final Algorithm alg, final List<File> GoodFiles) {
+		ExecutorService exec = Executors.newFixedThreadPool(GoodFiles.size());
+		long startTime = System.nanoTime();
+		for (int i = 0; i < GoodFiles.size(); i++) {
+			exec.execute(new Runnable() {
+				public void run() {
+					try {
+						FileEncryptor.saveEncFiles(GoodFiles.get((int) Thread.currentThread().getId()%GoodFiles.size()),
+								alg.enc(FileEncryptor.getFileBytes(
+										GoodFiles.get((int) Thread.currentThread().getId()%GoodFiles.size()).getPath())
+										));
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (IlegalKeyException e) {
+						System.err.println("There was problem with the key");
+					}
+				}
+			});
+		}
+		exec.shutdown();
+		long endTime = System.nanoTime();
+		long duration = (endTime - startTime);
+		double seconds = (double)duration / 1000000000.0;
+		System.err.println("finish async encryption and took: " +seconds+" seconds");
+	}
+	
+	private static void encFolderSync(final Algorithm alg, final List<File> GoodFiles) {
+		long startTime = System.nanoTime();
+		for (int i = 0; i < GoodFiles.size(); i++) {
+			try {
+				FileEncryptor.saveEncFiles(GoodFiles.get(i),
+						alg.enc(FileEncryptor.getFileBytes(GoodFiles.get(i).getPath()))
+						);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (IlegalKeyException e) {
+				System.err.println("There was problem with the key");
+			}
+		}
+		long endTime = System.nanoTime();
+		long duration = (endTime - startTime);
+		double seconds = (double)duration / 1000000000.0;
+		System.err.println("finish sync encryption and took: " +seconds+" seconds");
+	}
+
+	private static void encOneFile(final Algorithm alg, final String path) throws IOException, IlegalKeyException {
+		System.out.println("choosing the key file" );
+		String keyPath=getFilePath(true);
+		alg.beforeEnc(keyPath);
+		
+		byte[]plaintext = FileEncryptor.getFileBytes(path);
+		byte[]ans= alg.enc(plaintext);
+		FileEncryptor.saveEncFile(path,ans);
 	}
 
 	private static Algorithm getAlgorithmFromNum(int algoNum) {
