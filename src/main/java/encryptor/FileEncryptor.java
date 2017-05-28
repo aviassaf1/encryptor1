@@ -62,7 +62,7 @@ public class FileEncryptor {
         return keys;
 	}
 	public static void saveKeyToFile(String keysPath, int key) throws IOException {
-		PrintWriter out = new PrintWriter(keysPath+"\\key.bin");
+		PrintWriter out = new PrintWriter(new FileOutputStream(keysPath+"\\key.bin",true));
 		out.println(""+key);
 		out.close();
 	}
