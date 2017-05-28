@@ -1,5 +1,8 @@
 package encryptor;
 
+import java.io.IOException;
+import java.util.List;
+
 public class Reverse extends Algorithm {
 
 	Algorithm alg;
@@ -7,7 +10,7 @@ public class Reverse extends Algorithm {
 		this.alg=alg;
 	}
 	@Override
-	protected byte[] encImpl(byte[] plaintext) throws IlegalKeyException {
+	protected byte[] encImpl(byte[] plaintext)throws IlegalKeyException {
 		long startTime = System.nanoTime();
 		notifyObservers("start Reverse encryption");
 		byte[] ans= alg.decImpl(plaintext);
@@ -18,7 +21,7 @@ public class Reverse extends Algorithm {
 	}
 
 	@Override
-	protected byte[] decImpl(byte[] plaintext) throws IlegalKeyException {
+	protected byte[] decImpl(byte[] plaintext)throws IlegalKeyException {
 		long startTime = System.nanoTime();
 		notifyObservers("start Reverse decryption");
 		byte[] ans= alg.encImpl(plaintext);
@@ -28,13 +31,13 @@ public class Reverse extends Algorithm {
 		return ans;
 	}
 	@Override
-	public void beforeEnc(){
-		alg.beforeDec();
+	public void beforeEnc(String keysPath)throws IOException{
+		alg.beforeEnc(keysPath);
 	}
 
 	@Override
-	public void beforeDec() {
-		alg.beforeEnc();
+	public void beforeDec(List<Integer> keys)throws IlegalKeyException {
+		alg.beforeDec(keys);
 	}
 
 }

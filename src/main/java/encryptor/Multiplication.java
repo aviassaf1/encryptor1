@@ -1,5 +1,8 @@
 package encryptor;
 
+import java.io.IOException;
+import java.util.List;
+
 public class Multiplication extends Algorithm {
 
 	private int key;
@@ -19,11 +22,10 @@ public class Multiplication extends Algorithm {
 	}
 
 	@Override
-	protected byte[] decImpl(byte[] plaintext) {
+	protected byte[] decImpl(byte[] plaintext) throws IlegalKeyException {
 		boolean goodKey=false;
 		while(!goodKey)
 		{
-			try {
 				long startTime = System.nanoTime();
 				notifyObservers("start Multiplication decryption");
 				byte reversKey=findreversKey(key);
@@ -36,9 +38,6 @@ public class Multiplication extends Algorithm {
 				long duration = (endTime - startTime);
 				notifyObservers("finish Multiplication decryption and took: " +duration);
 				return ans;
-			} catch (IlegalKeyException e) {
-				System.err.println("there was a problem with the key, please try another key");
-			}
 		}
 		return null;
 	}
@@ -60,12 +59,15 @@ public class Multiplication extends Algorithm {
 		return b;
 	}
 	@Override
-	protected void beforeEnc(){
+	protected void beforeEnc(String keysPath) throws IOException{
 		key=getNewMulKey();
+		FileEncryptor.saveKeyToFile(keysPath,key);
 	}
 
 	@Override
-	protected void beforeDec() {
-		key=getKeyMulFromUser();
+	protected void beforeDec(List<Integer> keys) {
+		//key=getKeyMulFromUser();
+		key=keys.get(0);
+		keys.remove(0);
 	}
 }

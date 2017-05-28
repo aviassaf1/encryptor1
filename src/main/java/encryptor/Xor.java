@@ -1,5 +1,8 @@
 package encryptor;
 
+import java.io.IOException;
+import java.util.List;
+
 public class Xor extends Algorithm {
 	private int key;
 	@Override
@@ -33,13 +36,16 @@ public class Xor extends Algorithm {
 	}
 	
 	@Override
-	protected void beforeEnc(){
+	protected void beforeEnc(String keysPath) throws IOException{
 		key=getNewKey();
+		FileEncryptor.saveKeyToFile(keysPath,key);
 	}
 
 	@Override
-	protected void beforeDec() {
-		key=getKeyFromUser();
+	protected void beforeDec(List<Integer> keys) {
+		//key=getKeyFromUser();
+		key=keys.get(0);
+		keys.remove(0);
 	}
 
 }

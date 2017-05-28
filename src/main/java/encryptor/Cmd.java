@@ -1,5 +1,6 @@
 package encryptor;
 
+import java.util.List;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -60,18 +61,32 @@ public class Cmd implements Observer{
 		byte[] ans = null;
 		Algorithm alg=getAlgorithmFromNum(algoNum);
 		alg.addObserver(cmd);
+		Boolean done=false;
 		if(enc){
 			try {
-				alg.enc(plaintext);
+				String keyPath=getFilePath();
+				alg.enc(plaintext,keyPath);
+				done=true;
 			} catch (IlegalKeyException e) {
 				System.err.println("There was problem with the key");
+			}catch (IOException e) {
+				System.err.println("There was problem with the file path");
 			}
 		}
 		else{
-			try {
-				alg.dec(plaintext);
-			} catch (IlegalKeyException e) {
-				System.err.println("The key is illegal");
+			while(!done){
+				try {
+					try {
+						String keyPath=getFilePath();
+						List<Integer> keys=FileEncryptor.getKeys(keyPath);
+						alg.dec(plaintext,keys);
+						done=true;
+					} catch (IOException e) {
+						System.err.println("there was a problem with keys file, please try again");
+					}
+				} catch (IlegalKeyException e) {
+					System.err.println("The key is illegal, please try agains");
+				}
 			}
 		}
 		return ans;
@@ -132,18 +147,22 @@ public class Cmd implements Observer{
 	
 	
 
-	private static String getFilePath() throws IOException {
+	private static String getFilePath() {
 		boolean pathExist=false;
 		String path="";
 		BufferedReader buffer=new BufferedReader(new InputStreamReader(System.in));
 		System.out.println("plese enter file path here:");
 		while(!pathExist){
-			path=buffer.readLine();
-			File f = new File(path);
-			if(f.exists() && !f.isDirectory()) { 
-			   pathExist=true;
-			}
-			else{
+			try {
+				path=buffer.readLine();
+				File f = new File(path);
+				if(f.exists() && !f.isDirectory()) { 
+				   pathExist=true;
+				}
+				else{
+					System.out.println("the path you enterd is not a correct file path, please try again:");
+				}
+			} catch (IOException e) {
 				System.out.println("the path you enterd is not a correct file path, please try again:");
 			}
 		}

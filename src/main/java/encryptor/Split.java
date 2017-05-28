@@ -1,5 +1,8 @@
 package encryptor;
 
+import java.io.IOException;
+import java.util.List;
+
 public class Split extends Algorithm {
 
 	Algorithm alg1;
@@ -9,7 +12,7 @@ public class Split extends Algorithm {
 		this.alg2=alg2;
 	}
 	@Override
-	protected byte[] encImpl(byte[] plaintext) throws IlegalKeyException {
+	protected byte[] encImpl(byte[] plaintext) throws IlegalKeyException{
 		long startTime = System.nanoTime();
 		notifyObservers("start Split encryption");
 		byte[] plaintext2=new byte[plaintext.length];
@@ -30,7 +33,7 @@ public class Split extends Algorithm {
 	}
 
 	@Override
-	protected byte[] decImpl(byte[] plaintext) throws IlegalKeyException {
+	protected byte[] decImpl(byte[] plaintext)throws IlegalKeyException {
 		long startTime = System.nanoTime();
 		notifyObservers("start Split decryption");
 		byte[] plaintext2=new byte[plaintext.length];
@@ -51,14 +54,14 @@ public class Split extends Algorithm {
 	}
 
 	@Override
-	protected void beforeEnc() {
-		alg1.beforeEnc();
-		alg2.beforeEnc();
+	protected void beforeEnc(String keysPath)throws IOException {
+		alg1.beforeEnc(keysPath);
+		alg2.beforeEnc(keysPath);
 	}
 
 	@Override
-	protected void beforeDec() {
-		alg1.beforeDec();
-		alg2.beforeDec();
+	protected void beforeDec(List<Integer> keys)throws IlegalKeyException {
+		alg1.beforeDec(keys);
+		alg2.beforeDec(keys);
 	}
 }

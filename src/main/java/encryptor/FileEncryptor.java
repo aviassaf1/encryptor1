@@ -1,9 +1,13 @@
 package encryptor;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.LinkedList;
+import java.util.List;
 
 public class FileEncryptor {
 	
@@ -37,6 +41,30 @@ public class FileEncryptor {
 		FileOutputStream out;
 		out = new FileOutputStream(oldPath+".encrypted");
 		out.write(encBytes);
+		out.close();
+	}
+	protected static List<Integer> getKeys(String keyPath) throws IOException, IlegalKeyException {
+		List<Integer> keys=new LinkedList<Integer>();
+		BufferedReader in = new BufferedReader(new FileReader(keyPath));
+        String line;
+        while ((line = in.readLine()) != null) {
+            int key;
+			try {
+				key = Integer.getInteger(line);
+			} catch (Exception e) {
+				in.close();
+				throw new IlegalKeyException("one of the keys wasnt valid key");
+			}
+            keys.add(key);
+        }
+        in.close();
+        return keys;
+	}
+	public static void saveKeyToFile(String keysPath, int key) throws IOException {
+		FileOutputStream out = new FileOutputStream(keysPath);
+		out.write(key);
+		byte [] line= {'\n'};
+		out.write(line);
 		out.close();
 	}
 }
